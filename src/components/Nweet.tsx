@@ -45,12 +45,17 @@ const Nweet = ({ nweetObj, isOwner }: any) => {
   );
 
   const deleteDoc = useMutation(
-    (id) => axios.delete(`https://firestore.googleapis.com/v1/projects/tablelab-d9e2e/databases/(default)/documents/nweets/${id}`), {
-    onSuccess(data) {
+    (id: string) => axios.delete(`https://firestore.googleapis.com/v1/projects/tablelab-d9e2e/databases/(default)/documents/nweets/${id}`).then(() => ({ id })), {
+    async onSuccess(data) {
       console.log(data);
+      await queryClient.cancelQueries(['nweets'])
+      const previousNweets = queryClient.getQueryData<INweet[]>(['nweets'])
+      queryClient.setQueryData<INweet[]>(['nweets'], (oldData = []) => oldData.filter((item) => item.id !== data.id))
+
+      return { previousNweets }
     },
-    onError(error, variables, context) {
-      console.log(error, variables, context);
+    onError(error, variables, context: any) {
+      queryClient.setQueryData(['nweets'], context.previousNweets)
     }
   })
 
