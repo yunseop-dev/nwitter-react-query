@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash, faPencilAlt } from "@fortawesome/free-solid-svg-icons";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios, { AxiosError } from "axios";
+import last from "lodash/last";
+import { INweet } from "../routes/Home";
 
 interface INweetUpdateVariables {
   id: string;
@@ -10,20 +12,34 @@ interface INweetUpdateVariables {
 }
 
 const Nweet = ({ nweetObj, isOwner }: any) => {
+  const queryClient = useQueryClient();
   const [editing, setEditing] = useState(false);
   const [newNweet, setNewNweet] = useState(nweetObj.text);
-  const updateDoc = useMutation<any, AxiosError, INweetUpdateVariables>(
-    ({ id, text }) => axios.patch(`https://firestore.googleapis.com/v1/projects/tablelab-d9e2e/databases/(default)/documents/nweets/${id}?updateMask.fieldPaths=text`, {
+  const updateDoc = useMutation<INweet, AxiosError, INweetUpdateVariables>(
+    ({ id, text }) => axios.patch<INweet>(`https://firestore.googleapis.com/v1/projects/tablelab-d9e2e/databases/(default)/documents/nweets/${id}?updateMask.fieldPaths=text`, {
       fields: {
         text: { stringValue: text },
       }
-    }),
+    }).then(({ data }: any) => ({
+      id: last((data.name as string).split('/')),
+      text: data.fields.text.stringValue,
+      createdAt: Number(data.fields.createdAt.integerValue),
+      creatorId: data.fields.creatorId.stringValue,
+      attachmentUrl: data.fields.attachmentUrl.stringValue,
+    } as INweet)),
     {
-      onSuccess(data) {
-        console.log(data);
+      async onSuccess(data) {
+        await queryClient.cancelQueries(['nweets'])
+        const previousNweets = queryClient.getQueryData<INweet[]>(['nweets'])
+        queryClient.setQueryData<INweet[]>(['nweets'], (oldData = []) => oldData.map((item) => {
+          if (item.id === data.id) return data;
+          return item;
+        }))
+
+        return { previousNweets }
       },
-      onError(error, variables, context) {
-        console.log(error, variables, context);
+      onError(error, variables, context: any) {
+        queryClient.setQueryData(['nweets'], context.previousNweets)
       }
     }
   );
