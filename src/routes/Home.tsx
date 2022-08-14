@@ -1,11 +1,18 @@
-import { dbService } from "../fbase";
+import { authService, dbService } from "../fbase";
 import { useEffect, useState } from "react";
 import Nweet from "../components/Nweet";
 import NweetFactory from "../components/NweetFactory";
 import { collection, getDocs, orderBy, query } from "firebase/firestore";
+import { useAuthUser } from "../hooks/quries/useAuthUser";
 
 const Home = ({ userObj }: any) => {
   const [nweets, setNweets] = useState<any[]>([]);
+  const user = useAuthUser(['user'], authService, {
+    select: (data) => ({
+      uid: data?.uid ?? '',
+      displayName: data?.displayName ?? '',
+    })
+  });
 
   useEffect(() => {
     getDocs(
@@ -25,13 +32,13 @@ const Home = ({ userObj }: any) => {
 
   return (
     <div className="container">
-      <NweetFactory userObj={userObj} />
+      <NweetFactory />
       <div style={{ marginTop: 30 }}>
         {nweets.map((nweet) => (
           <Nweet
             key={nweet.id}
             nweetObj={nweet}
-            isOwner={nweet.creatorId === userObj.uid}
+            isOwner={nweet.creatorId === user.data?.uid}
           />
         ))}
       </div>

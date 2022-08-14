@@ -1,14 +1,21 @@
 import { useState } from "react";
-import { dbService, storageService } from "../fbase";
+import { authService, dbService, storageService } from "../fbase";
 import { v4 as uuidv4 } from "uuid";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { addDoc, collection } from "firebase/firestore";
 import { getDownloadURL, ref, uploadString } from "firebase/storage";
+import { useAuthUser } from "../hooks/quries/useAuthUser";
 
-const NweetFactory = ({ userObj }: any) => {
+const NweetFactory = () => {
   const [nweet, setNweet] = useState("");
   const [attachment, setAttachment] = useState("");
+  const user = useAuthUser(['user'], authService, {
+    select: (data) => ({
+      uid: data?.uid ?? '',
+      displayName: data?.displayName ?? '',
+    })
+  });
 
   const onSubmit = async (event: any) => {
     event.preventDefault();
@@ -23,7 +30,7 @@ const NweetFactory = ({ userObj }: any) => {
       //   .ref()
       //   .child();
 
-      const attachmentRef = ref(storageService, `${userObj.uid}/${uuidv4()}`)
+      const attachmentRef = ref(storageService, `${user.data?.uid}/${uuidv4()}`)
 
       await uploadString(attachmentRef, attachment, "data_url")
       attachmentUrl = await getDownloadURL(attachmentRef);
@@ -32,7 +39,7 @@ const NweetFactory = ({ userObj }: any) => {
     const nweetObj = {
       text: nweet,
       createdAt: Date.now(),
-      creatorId: userObj.uid,
+      creatorId: user.data?.uid,
       attachmentUrl,
     };
     await addDoc(

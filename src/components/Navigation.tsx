@@ -2,8 +2,17 @@ import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTwitter } from "@fortawesome/free-brands-svg-icons";
 import { faUser } from "@fortawesome/free-solid-svg-icons";
+import { useAuthUser } from "../hooks/quries/useAuthUser";
+import { authService } from "../fbase";
 
 const Navigation = ({ userObj }: any) => {
+  const user = useAuthUser(['user'], authService, {
+    select: (data) => ({
+      uid: data?.uid ?? '',
+      displayName: data?.displayName ?? '',
+    })
+  });
+
   return (
     <nav>
       <ul style={{ display: "flex", justifyContent: "center", marginTop: 50 }}>
@@ -25,8 +34,8 @@ const Navigation = ({ userObj }: any) => {
           >
             <FontAwesomeIcon icon={faUser} color={"#04AAFF"} size="2x" />
             <span style={{ marginTop: 10 }}>
-              {userObj.displayName
-                ? `${userObj.displayName}의 Profile`
+              {user.data?.displayName
+                ? `${user.data?.displayName}의 Profile`
                 : "Profile"}
             </span>
           </Link>

@@ -1,43 +1,17 @@
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
 import AppRouter from "./Router";
 import { authService } from "../fbase";
-import { updateProfile, User } from "firebase/auth";
+import { useAuthUser } from "../hooks/quries/useAuthUser";
 
 function App() {
-  const [init, setInit] = useState(false);
-  const [userObj, setUserObj] = useState<any>(null);
-
-  useEffect(() => {
-    authService.onAuthStateChanged((user) => {
-      if (user) {
-        setUserObj({
-          uid: user.uid,
-          displayName: user.displayName,
-          updateProfile: (args: any) => updateProfile(user as User, args),
-        });
-      } else {
-        setUserObj(false);
-      }
-      setInit(true);
-    });
-  }, []);
-
-  const refreshUser = () => {
-    const user = authService.currentUser;
-    setUserObj({
-      uid: user?.uid,
-      displayName: user?.displayName,
-      updateProfile: (args: any) => updateProfile(user as User, args),
-    });
-  };
+  const user = useAuthUser(['user'], authService);
+  const isLoggedIn = useMemo(() => user.isSuccess, [user.isSuccess]);
 
   return (
     <>
-      {init ? (
+      {user.isFetched ? (
         <AppRouter
-          refreshUser={refreshUser}
-          isLoggedIn={Boolean(userObj)}
-          userObj={userObj}
+          isLoggedIn={isLoggedIn}
         />
       ) : (
         "initializing..."
