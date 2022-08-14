@@ -1,8 +1,6 @@
-import { dbService } from "../fbase";
 import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash, faPencilAlt } from "@fortawesome/free-solid-svg-icons";
-// import { doc, updateDoc } from "firebase/firestore";
 import { useMutation } from "@tanstack/react-query";
 import axios, { AxiosError } from "axios";
 
