@@ -6,19 +6,34 @@ import {
 } from "@fortawesome/free-brands-svg-icons";
 import { authService } from "../fbase";
 import AuthForm from "../components/AuthForm";
-import { GithubAuthProvider, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { GithubAuthProvider, GoogleAuthProvider, User } from "firebase/auth";
+import useAuthSignInWithPopup from "../hooks/mutations/useAuthSignInWithPopup";
+import { useQueryClient } from "@tanstack/react-query";
 
 const Auth = () => {
+  const queryClient = useQueryClient();
+  const signInWithPopup = useAuthSignInWithPopup(authService, {
+    async onSuccess(data) {
+      await queryClient.cancelQueries(['user'])
+      const previousUser = queryClient.getQueryData(['user'])
+      queryClient.setQueryData<User>(['user'], () => data.user)
+
+      return { previousUser }
+    },
+    onError(error, variables, context: any) {
+      queryClient.setQueryData(['user'], context.previousUser)
+    }
+  });
   const onSocialClick: React.MouseEventHandler<HTMLButtonElement> = async (event: any) => {
     const {
       target: { name },
     } = event;
     if (name === "google") {
       const provider = new GoogleAuthProvider();
-      await signInWithPopup(authService, provider);
+      await signInWithPopup.mutateAsync({ provider });
     } else if (name === "github") {
       const provider = new GithubAuthProvider();
-      await signInWithPopup(authService, provider);
+      await signInWithPopup.mutateAsync({ provider });
     }
   };
 
