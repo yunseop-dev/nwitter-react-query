@@ -5,13 +5,15 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { getDownloadURL, ref, uploadString } from "firebase/storage";
 import { useAuthUser } from "../hooks/quries/useAuthUser";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { INweet } from "../routes/Home";
+import { last } from "lodash";
 
 type INewNweet = Omit<INweet, 'id'>;
 
 const NweetFactory = () => {
+  const queryClient = useQueryClient();
   const [nweet, setNweet] = useState("");
   const [attachment, setAttachment] = useState("");
   const user = useAuthUser(['user'], authService, {
@@ -21,14 +23,32 @@ const NweetFactory = () => {
     })
   });
 
-  const addDoc = useMutation((nweet: INewNweet) => axios.post("https://firestore.googleapis.com/v1/projects/tablelab-d9e2e/databases/(default)/documents/nweets", {
-    fields: {
-      text: { stringValue: nweet.text },
-      createdAt: { integerValue: nweet.createdAt },
-      creatorId: { stringValue: nweet.creatorId },
-      attachmentUrl: { stringValue: nweet.attachmentUrl },
+  const addDoc = useMutation(
+    (nweet: INewNweet) => axios.post<INweet>("https://firestore.googleapis.com/v1/projects/tablelab-d9e2e/databases/(default)/documents/nweets", {
+      fields: {
+        text: { stringValue: nweet.text },
+        createdAt: { integerValue: nweet.createdAt },
+        creatorId: { stringValue: nweet.creatorId },
+        attachmentUrl: { stringValue: nweet.attachmentUrl },
+      }
+    }).then(({ data }: any) => ({
+      id: last((data.name as string).split('/')),
+      text: data.fields.text.stringValue,
+      createdAt: Number(data.fields.createdAt.integerValue),
+      creatorId: data.fields.creatorId.stringValue,
+      attachmentUrl: data.fields.attachmentUrl.stringValue,
+    } as INweet)), {
+    async onSuccess(data) {
+      await queryClient.cancelQueries(['nweets'])
+      const previousNweets = queryClient.getQueryData<INweet[]>(['nweets'])
+      queryClient.setQueryData<INweet[]>(['nweets'], (oldData = []) => [data, ...oldData])
+
+      return { previousNweets }
+    },
+    onError(error, variables, context: any) {
+      queryClient.setQueryData(['nweets'], context.previousNweets)
     }
-  }))
+  })
 
   const onSubmit = async (event: any) => {
     event.preventDefault();
