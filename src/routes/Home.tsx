@@ -6,7 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import last from "lodash/last";
 
-interface INweet {
+export interface INweet {
   id: string;
   text: string;
   createdAt: number;
