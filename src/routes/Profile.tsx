@@ -2,7 +2,8 @@ import { authService } from "../fbase";
 import { ChangeEventHandler, FormEventHandler, useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { useAuthUser } from "../hooks/quries/useAuthUser";
-import useAuthUpdateProfile from "../hooks/quries/useAuthUpdateProfile";
+import useAuthUpdateProfile from "../hooks/mutations/useAuthUpdateProfile";
+import useAuthSignOut from "../hooks/mutations/useAuthSignOut";
 import { User } from "firebase/auth";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -33,10 +34,30 @@ const Profile = () => {
       queryClient.setQueryData(['user'], context.previousUser)
     }
   });
+
+  const signOut = useAuthSignOut(authService, {
+    onMutate: async _ => {
+      await queryClient.cancelQueries(['user'])
+      const previousUser = queryClient.getQueryData(['user'])
+      queryClient.setQueryData(['user'], null)
+
+      return { previousUser }
+    },
+    onError: (err, _, context: any) => {
+      queryClient.setQueryData(
+        ['user'],
+        context.previousUser
+      )
+    },
+    onSettled() {
+      queryClient.invalidateQueries(['user'])
+      queryClient.clear();
+    }
+  });
   const [newDisplayName, setNewDisplayName] = useState(user.data?.displayName ?? '');
 
-  const onLogOutClick = () => {
-    authService.signOut();
+  const onLogOutClick = async () => {
+    await signOut.mutateAsync();
     history.push("/");
   };
 

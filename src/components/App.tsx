@@ -5,18 +5,12 @@ import { useAuthUser } from "../hooks/quries/useAuthUser";
 
 function App() {
   const user = useAuthUser(['user'], authService);
-  const isLoggedIn = useMemo(() => user.isSuccess, [user.isSuccess]);
+  const isLoggedIn = useMemo(() => user.isSuccess && user.data !== null, [user.data, user.isSuccess]);
 
   return (
-    <>
-      {user.isFetched ? (
-        <AppRouter
-          isLoggedIn={isLoggedIn}
-        />
-      ) : (
-        "initializing..."
-      )}
-    </>
+    <AppRouter
+      isLoggedIn={isLoggedIn}
+    />
   );
 }
 
