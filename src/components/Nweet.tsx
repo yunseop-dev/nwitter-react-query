@@ -2,13 +2,34 @@ import { dbService } from "../fbase";
 import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash, faPencilAlt } from "@fortawesome/free-solid-svg-icons";
-import { doc, updateDoc } from "firebase/firestore";
+// import { doc, updateDoc } from "firebase/firestore";
 import { useMutation } from "@tanstack/react-query";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
+
+interface INweetUpdateVariables {
+  id: string;
+  text: string
+}
 
 const Nweet = ({ nweetObj, isOwner }: any) => {
   const [editing, setEditing] = useState(false);
   const [newNweet, setNewNweet] = useState(nweetObj.text);
+  const updateDoc = useMutation<any, AxiosError, INweetUpdateVariables>(
+    ({ id, text }) => axios.patch(`https://firestore.googleapis.com/v1/projects/tablelab-d9e2e/databases/(default)/documents/nweets/${id}?updateMask.fieldPaths=text`, {
+      fields: {
+        text: { stringValue: text },
+      }
+    }),
+    {
+      onSuccess(data) {
+        console.log(data);
+      },
+      onError(error, variables, context) {
+        console.log(error, variables, context);
+      }
+    }
+  );
+
   const deleteDoc = useMutation(
     (id) => axios.delete(`https://firestore.googleapis.com/v1/projects/tablelab-d9e2e/databases/(default)/documents/nweets/${id}`), {
     onSuccess(data) {
@@ -38,7 +59,10 @@ const Nweet = ({ nweetObj, isOwner }: any) => {
 
   const onSubmit = async (event: any) => {
     event.preventDefault();
-    await updateDoc(doc(dbService, `nweets/${nweetObj.id}`), { text: newNweet })
+    await updateDoc.mutateAsync({
+      id: nweetObj.id,
+      text: newNweet,
+    })
     setEditing(false);
   };
 
