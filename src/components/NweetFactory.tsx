@@ -1,11 +1,15 @@
 import { useState } from "react";
-import { authService, dbService, storageService } from "../fbase";
+import { authService, storageService } from "../fbase";
 import { v4 as uuidv4 } from "uuid";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faTimes } from "@fortawesome/free-solid-svg-icons";
-import { addDoc, collection } from "firebase/firestore";
 import { getDownloadURL, ref, uploadString } from "firebase/storage";
 import { useAuthUser } from "../hooks/quries/useAuthUser";
+import { useMutation } from "@tanstack/react-query";
+import axios from "axios";
+import { INweet } from "../routes/Home";
+
+type INewNweet = Omit<INweet, 'id'>;
 
 const NweetFactory = () => {
   const [nweet, setNweet] = useState("");
@@ -16,6 +20,15 @@ const NweetFactory = () => {
       displayName: data?.displayName ?? '',
     })
   });
+
+  const addDoc = useMutation((nweet: INewNweet) => axios.post("https://firestore.googleapis.com/v1/projects/tablelab-d9e2e/databases/(default)/documents/nweets", {
+    fields: {
+      text: { stringValue: nweet.text },
+      createdAt: { integerValue: nweet.createdAt },
+      creatorId: { stringValue: nweet.creatorId },
+      attachmentUrl: { stringValue: nweet.attachmentUrl },
+    }
+  }))
 
   const onSubmit = async (event: any) => {
     event.preventDefault();
@@ -36,16 +49,13 @@ const NweetFactory = () => {
       attachmentUrl = await getDownloadURL(attachmentRef);
     }
 
-    const nweetObj = {
+    const nweetObj: INewNweet = {
       text: nweet,
       createdAt: Date.now(),
-      creatorId: user.data?.uid,
+      creatorId: user.data?.uid ?? '',
       attachmentUrl,
     };
-    await addDoc(
-      collection(dbService, "nweets"),
-      nweetObj
-    )
+    await addDoc.mutateAsync(nweetObj)
 
     setNweet("");
     setAttachment("");
