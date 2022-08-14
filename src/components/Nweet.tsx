@@ -1,25 +1,29 @@
-import { dbService, storageService } from "../fbase";
+import { dbService } from "../fbase";
 import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash, faPencilAlt } from "@fortawesome/free-solid-svg-icons";
-import { deleteDoc, doc, updateDoc } from "firebase/firestore";
-import { deleteObject, ref } from "firebase/storage";
+import { doc, updateDoc } from "firebase/firestore";
+import { useMutation } from "@tanstack/react-query";
+import axios from "axios";
 
 const Nweet = ({ nweetObj, isOwner }: any) => {
   const [editing, setEditing] = useState(false);
   const [newNweet, setNewNweet] = useState(nweetObj.text);
+  const deleteDoc = useMutation(
+    (id) => axios.delete(`https://firestore.googleapis.com/v1/projects/tablelab-d9e2e/databases/(default)/documents/nweets/${id}`), {
+    onSuccess(data) {
+      console.log(data);
+    },
+    onError(error, variables, context) {
+      console.log(error, variables, context);
+    }
+  })
 
   const onDeleteClick = async () => {
     const ok = window.confirm("삭제하시겠습니까?");
 
     if (ok) {
-      await deleteDoc(
-        doc(dbService, `nweets/${nweetObj.id}`)
-      );
-      if (nweetObj.attachmentUrl !== "")
-        await deleteObject(
-          ref(storageService, nweetObj.attachmentUrl)
-        )
+      await deleteDoc.mutateAsync(nweetObj.id);
     }
   };
 
