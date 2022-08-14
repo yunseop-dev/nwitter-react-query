@@ -1,10 +1,39 @@
 import { authService } from "../fbase";
-import { ChangeEventHandler, FormEventHandler, useState } from "react";
+import { ChangeEventHandler, FormEventHandler, useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
+import { useAuthUser } from "../hooks/quries/useAuthUser";
+import useAuthUpdateProfile from "../hooks/quries/useAuthUpdateProfile";
+import { User } from "firebase/auth";
+import { useQueryClient } from "@tanstack/react-query";
 
-const Profile = ({ userObj, refreshUser }: any) => {
+const Profile = () => {
   const history = useHistory();
-  const [newDisplayName, setNewDisplayName] = useState(userObj.displayName);
+  const queryClient = useQueryClient();
+  const user = useAuthUser(['user'], authService, {
+    select: (data) => ({
+      uid: data?.uid ?? '',
+      displayName: data?.displayName ?? '',
+    })
+  });
+
+  const updateProfile = useAuthUpdateProfile({
+    async onSuccess(data) {
+      await queryClient.cancelQueries(['user'])
+      const previousUser = queryClient.getQueryData(['user'])
+      queryClient.setQueryData<User>(['user'], (old) => ({
+        ...old,
+        ...data.user,
+        displayName: data.displayName ?? '',
+        photoURL: data.photoURL ?? ''
+      }))
+
+      return { previousUser }
+    },
+    onError(error, variables, context: any) {
+      queryClient.setQueryData(['user'], context.previousUser)
+    }
+  });
+  const [newDisplayName, setNewDisplayName] = useState(user.data?.displayName ?? '');
 
   const onLogOutClick = () => {
     authService.signOut();
@@ -20,11 +49,16 @@ const Profile = ({ userObj, refreshUser }: any) => {
 
   const onSubmit: FormEventHandler<HTMLFormElement> = async (event) => {
     event.preventDefault();
-    if (userObj.displayName !== newDisplayName) {
-      await userObj.updateProfile({ displayName: newDisplayName });
-      refreshUser();
+    if (user.data?.displayName !== newDisplayName) {
+      await updateProfile.mutateAsync({ user: authService.currentUser as User, displayName: newDisplayName });
     }
   };
+
+  useEffect(() => {
+    if (user.isSuccess) {
+      setNewDisplayName(user.data.displayName);
+    }
+  }, [user.data?.displayName, user.isSuccess])
 
   return (
     <div className="container">
