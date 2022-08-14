@@ -4,8 +4,9 @@ import NweetFactory from "../components/NweetFactory";
 import { useAuthUser } from "../hooks/quries/useAuthUser";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
+import last from "lodash/last";
 
-interface Nweet {
+interface INweet {
   id: string;
   text: string;
   createdAt: number;
@@ -20,7 +21,7 @@ const Home = ({ userObj }: any) => {
       displayName: data?.displayName ?? '',
     })
   });
-  const nweets = useQuery<Nweet[], Error>(['nweets'], {
+  const nweets = useQuery<INweet[], Error>(['nweets'], {
     queryFn: () => axios.post('https://firestore.googleapis.com/v1/projects/tablelab-d9e2e/databases/(default)/documents:runQuery', {
       structuredQuery:
       {
@@ -40,7 +41,7 @@ const Home = ({ userObj }: any) => {
       }
     })
       .then(({ data }) => data.map((item: any) => item.document).map(((item: any) => ({
-        id: item.name,
+        id: last((item.name as string).split('/')),
         text: item.fields.text.stringValue,
         createdAt: Number(item.fields.createdAt.integerValue),
         creatorId: item.fields.creatorId.stringValue,
