@@ -2,11 +2,11 @@ import { authService } from "../fbase";
 import Nweet from "../components/Nweet";
 import NweetFactory from "../components/NweetFactory";
 import { useAuthUser } from "../hooks/quries/useAuthUser";
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import axios from "axios";
 import last from "lodash/last";
-import { useQueryParam, NumberParam, StringParam } from "use-query-params";
-import { Link } from "react-router-dom";
+import flattenDeep from "lodash/flattenDeep";
+import { useMemo } from "react";
 
 export interface INweet {
   id: string;
@@ -18,27 +18,29 @@ export interface INweet {
 
 const LIMIT = 5;
 
-function useNweetsQuery({ limit = LIMIT, pageToken }: { limit: number; pageToken?: string; }) {
-  return useQuery<{ list: INweet[]; nextPageToken: string; }, Error>(['nweets', { pageToken, limit }], {
-    queryFn: () => axios.get('https://firestore.googleapis.com/v1/projects/tablelab-d9e2e/databases/(default)/documents/nweets', {
-      params: {
-        pageSize: limit,
-        orderBy: 'createdAt desc',
-        pageToken
-      }
-    }).then(({ data }) => {
-      const list = data.documents.map(((item: any) => ({
-        id: last((item.name as string).split('/')),
-        text: item.fields.text.stringValue,
-        createdAt: Number(item.fields.createdAt.integerValue),
-        creatorId: item.fields.creatorId.stringValue,
-        attachmentUrl: item.fields.attachmentUrl.stringValue,
-      })));
-      const nextPageToken = data.nextPageToken;
-      return { list, nextPageToken }
-    })
-  })
-}
+function useNweetsInfiniteQuery() {
+  return useInfiniteQuery(['nweets'], ({ pageParam }) => axios.get('https://firestore.googleapis.com/v1/projects/tablelab-d9e2e/databases/(default)/documents/nweets', {
+    params: {
+      pageSize: LIMIT,
+      orderBy: 'createdAt desc',
+      pageToken: pageParam
+    }
+  }).then(({ data }) => {
+    const list = data.documents.map(((item: any) => ({
+      id: last((item.name as string).split('/')),
+      text: item.fields.text.stringValue,
+      createdAt: Number(item.fields.createdAt.integerValue),
+      creatorId: item.fields.creatorId.stringValue,
+      attachmentUrl: item.fields.attachmentUrl.stringValue,
+    })));
+    const nextPageToken = data.nextPageToken;
+    return { list, nextPageToken }
+  }),
+    {
+      getNextPageParam: (lastPage) => lastPage.nextPageToken,
+    }
+  )
+};
 
 const Home = () => {
   const user = useAuthUser(['user'], authService, {
@@ -47,16 +49,14 @@ const Home = () => {
       displayName: data?.displayName ?? '',
     })
   });
-  const [pageToken] = useQueryParam('pageToken', StringParam);
-  const [limit] = useQueryParam('limit', NumberParam);
-  const nweets = useNweetsQuery({ pageToken: pageToken ?? undefined, limit: limit ?? 5 })
-  const nextPageToken = nweets.data?.nextPageToken;
+  const nweets = useNweetsInfiniteQuery();
+  const list = useMemo(() => flattenDeep(nweets.data?.pages.map(page => page.list) ?? []), [nweets.data?.pages])
 
   return (
     <div className="container">
       <NweetFactory />
       <div style={{ marginTop: 30 }}>
-        {nweets.data?.list.map((nweet) => (
+        {list.map((nweet) => (
           <Nweet
             key={nweet.id}
             nweetObj={nweet}
@@ -64,7 +64,7 @@ const Home = () => {
           />
         ))}
       </div>
-      <Link to={{ search: `pageToken=${nextPageToken}` }}>Next</Link>
+      {nweets.hasNextPage && <button onClick={() => nweets.fetchNextPage()}>Next</button>}
     </div>
   );
 };
