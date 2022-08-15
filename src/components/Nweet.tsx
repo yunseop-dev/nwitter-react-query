@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash, faPencilAlt } from "@fortawesome/free-solid-svg-icons";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { InfiniteData, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios, { AxiosError } from "axios";
 import last from "lodash/last";
 import { INweet } from "../routes/Home";
+import produce from "immer";
 
 interface INweetUpdateVariables {
   id: string;
@@ -30,10 +31,17 @@ const Nweet = ({ nweetObj, isOwner }: any) => {
     {
       async onSuccess(data) {
         await queryClient.cancelQueries(['nweets'])
-        const previousNweets = queryClient.getQueryData<INweet[]>(['nweets'])
-        queryClient.setQueryData<INweet[]>(['nweets'], (oldData = []) => oldData.map((item) => {
-          if (item.id === data.id) return data;
-          return item;
+        const previousNweets = queryClient.getQueryData<InfiniteData<{ list: INweet[]; nextPageToken: string; }>>(['nweets'])
+        queryClient.setQueryData<InfiniteData<{ list: INweet[]; nextPageToken: string; }>>(['nweets'], (oldData) => produce(oldData, draft => {
+          const pages = draft?.pages.map(item => ({
+            ...item,
+            list: item.list.map((nweet) => {
+              if (nweet.id === data.id) return data;
+              return nweet;
+            })
+          }))
+          // @ts-ignore;
+          draft.pages = pages;
         }))
 
         return { previousNweets }
@@ -49,8 +57,16 @@ const Nweet = ({ nweetObj, isOwner }: any) => {
     async onSuccess(data) {
       console.log(data);
       await queryClient.cancelQueries(['nweets'])
-      const previousNweets = queryClient.getQueryData<INweet[]>(['nweets'])
-      queryClient.setQueryData<INweet[]>(['nweets'], (oldData = []) => oldData.filter((item) => item.id !== data.id))
+      const previousNweets = queryClient.getQueryData<InfiniteData<{ list: INweet[]; nextPageToken: string; }>>(['nweets'])
+      queryClient.setQueryData<InfiniteData<{ list: INweet[]; nextPageToken: string; }>>(['nweets'], (oldData) => produce(oldData, draft => {
+        const pages = draft?.pages.map(item => ({
+          ...item,
+          list: item.list.filter((nweet) => (nweet.id !== data.id))
+        }))
+        // @ts-ignore;
+        draft.pages = pages;
+      }))
+
 
       return { previousNweets }
     },

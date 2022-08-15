@@ -5,10 +5,11 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { getDownloadURL, ref, uploadString } from "firebase/storage";
 import { useAuthUser } from "../hooks/quries/useAuthUser";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { InfiniteData, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { INweet } from "../routes/Home";
 import { last } from "lodash";
+import produce from "immer";
 
 type INewNweet = Omit<INweet, 'id'>;
 
@@ -40,8 +41,15 @@ const NweetFactory = () => {
     } as INweet)), {
     async onSuccess(data) {
       await queryClient.cancelQueries(['nweets'])
-      const previousNweets = queryClient.getQueryData<INweet[]>(['nweets'])
-      queryClient.setQueryData<INweet[]>(['nweets'], (oldData = []) => [data, ...oldData])
+      const previousNweets = queryClient.getQueryData<InfiniteData<{ list: INweet[]; nextPageToken: string; }>>(['nweets'])
+      queryClient.setQueryData<InfiniteData<{ list: INweet[]; nextPageToken: string; }>>(['nweets'], (oldData) => produce(oldData, draft => {
+        const pages = draft?.pages.map(item => ({
+          ...item,
+          list: [data, ...item.list]
+        }))
+        // @ts-ignore;
+        draft.pages = pages;
+      }))
 
       return { previousNweets }
     },
