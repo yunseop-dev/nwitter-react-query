@@ -19,7 +19,7 @@ export interface INweet {
 const LIMIT = 5;
 
 function useNweetsInfiniteQuery() {
-  return useInfiniteQuery(['nweets'], ({ pageParam }) => axios.get('https://firestore.googleapis.com/v1/projects/tablelab-d9e2e/databases/(default)/documents/nweets', {
+  return useInfiniteQuery<{ list: INweet[]; nextPageToken: string; }>(['nweets'], ({ pageParam }) => axios.get('https://firestore.googleapis.com/v1/projects/tablelab-d9e2e/databases/(default)/documents/nweets', {
     params: {
       pageSize: LIMIT,
       orderBy: 'createdAt desc',
@@ -38,6 +38,11 @@ function useNweetsInfiniteQuery() {
   }),
     {
       getNextPageParam: (lastPage) => lastPage.nextPageToken,
+      getPreviousPageParam: (firstPage, allPages) => {
+        const currentPage = allPages.length - 1;
+        const previousToken = allPages?.[currentPage - 1]?.nextPageToken;
+        return previousToken;
+      }
     }
   )
 };
@@ -64,6 +69,7 @@ const Home = () => {
           />
         ))}
       </div>
+      {nweets.hasPreviousPage && <button onClick={() => nweets.fetchPreviousPage()}>Prev</button>}
       {nweets.hasNextPage && <button onClick={() => nweets.fetchNextPage()}>Next</button>}
     </div>
   );
