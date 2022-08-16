@@ -1,3 +1,4 @@
+import { User } from "firebase/auth";
 import { useMemo } from "react";
 import { authService } from "../../fbase";
 import { useAuthUser } from "../firebase/queries/useAuthUser";
@@ -7,7 +8,8 @@ export default function useUser() {
         select: (data) => data ? ({
             uid: data?.uid ?? '',
             displayName: data?.displayName ?? '',
-        }) : null
+        }) : null,
+        initialData: authService.currentUser as User
     });
 
     return {
