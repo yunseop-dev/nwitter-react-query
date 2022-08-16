@@ -3,6 +3,7 @@ import useUser from "../hooks/queries/useUser";
 import Auth from "../pages/auth";
 import Home from "../pages/home";
 import Profile from "../pages/profile";
+import AuthRoute from "./AuthRoute";
 import Navigation from "./Navigation";
 
 const AppRouter = () => {
@@ -11,29 +12,15 @@ const AppRouter = () => {
     <Router>
       {isLoggedIn && <Navigation />}
       <Switch>
-        {isLoggedIn ? (
-          <div
-            style={{
-              maxWidth: 890,
-              width: "100%",
-              margin: "0 auto",
-              marginTop: 80,
-              display: "flex",
-              justifyContent: "center",
-            }}
-          >
-            <Route exact path="/">
-              <Home />
-            </Route>
-            <Route exact path="/profile">
-              <Profile />
-            </Route>
-          </div>
-        ) : (
-          <Route exact path="/">
-            <Auth />
-          </Route>
-        )}
+        <AuthRoute exact path="/">
+          <Home />
+        </AuthRoute>
+        <AuthRoute exact path="/profile">
+          <Profile />
+        </AuthRoute>
+        <Route exact path="/signin">
+          <Auth />
+        </Route>
       </Switch>
     </Router>
   );
