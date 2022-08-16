@@ -35,7 +35,7 @@ const Profile = () => {
 
   useEffect(() => {
     if (user.isSuccess) {
-      setNewDisplayName(user.data.displayName);
+      setNewDisplayName(user.data?.displayName ?? '');
     }
   }, [user.data?.displayName, user.isSuccess])
 

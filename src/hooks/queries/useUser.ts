@@ -4,14 +4,14 @@ import { useAuthUser } from "../firebase/queries/useAuthUser";
 
 export default function useUser() {
     const user = useAuthUser(['user'], authService, {
-        select: (data) => ({
+        select: (data) => data ? ({
             uid: data?.uid ?? '',
             displayName: data?.displayName ?? '',
-        })
+        }) : null
     });
 
     return {
         ...user,
-        isLoggedIn: useMemo(() => user.data !== null, [user.data])
+        isLoggedIn: useMemo(() => user.data?.uid || user.data !== null, [user.data])
     }
 }
