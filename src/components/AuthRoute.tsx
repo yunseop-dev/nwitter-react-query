@@ -1,26 +1,25 @@
-import React, { useEffect } from 'react';
 import { Route } from 'react-router';
+import { Redirect } from 'react-router-dom';
 import useUser from '../hooks/queries/useUser';
-import useNweetHistory from '../hooks/useNweetHistory';
 
-const AuthRoute = ({ component: Component, ...rest }: any) => {
-    const history = useNweetHistory();
+const AuthRoute = ({ children, ...rest }: any) => {
     const { isLoggedIn } = useUser()
-
-    useEffect(() => {
-        if (!isLoggedIn) {
-            history.replaceWithSignInPage();
-        }
-    }, [history, isLoggedIn]);
 
     return (
         <Route
             {...rest}
-            render={routeProps => (
-                isLoggedIn
-                    ? <Component {...routeProps} />
-                    : <div>Loading...</div>
-            )}
+            render={({ location }) =>
+                isLoggedIn ? (
+                    children
+                ) : (
+                    <Redirect
+                        to={{
+                            pathname: "/signin",
+                            state: { from: location }
+                        }}
+                    />
+                )
+            }
         />
     )
 };
