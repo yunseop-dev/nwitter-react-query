@@ -6,9 +6,11 @@ import useNweetHistory from '../hooks/useNweetHistory';
 const AuthRoute = ({ component: Component, ...rest }: any) => {
     const history = useNweetHistory();
     const { isLoggedIn } = useUser()
+
     useEffect(() => {
-        if (isLoggedIn) return;
-        history.replaceWithSignInPage();
+        if (!isLoggedIn) {
+            history.replaceWithSignInPage();
+        }
     }, [history, isLoggedIn]);
 
     return (

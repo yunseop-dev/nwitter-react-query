@@ -29,8 +29,9 @@ const Auth = () => {
   };
 
   useEffect(() => {
-    if (!isLoggedIn) return;
-    history.moveToHomePage();
+    if (isLoggedIn) {
+      history.moveToHomePage();
+    }
   }, [isLoggedIn, history])
 
   return (
