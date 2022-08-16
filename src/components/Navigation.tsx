@@ -2,16 +2,10 @@ import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTwitter } from "@fortawesome/free-brands-svg-icons";
 import { faUser } from "@fortawesome/free-solid-svg-icons";
-import { useAuthUser } from "../hooks/quries/useAuthUser";
-import { authService } from "../fbase";
+import useUser from "../hooks/queries/useUser";
 
 const Navigation = ({ userObj }: any) => {
-  const user = useAuthUser(['user'], authService, {
-    select: (data) => ({
-      uid: data?.uid ?? '',
-      displayName: data?.displayName ?? '',
-    })
-  });
+  const user = useUser()
 
   return (
     <nav>

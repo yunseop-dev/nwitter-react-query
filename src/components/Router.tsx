@@ -1,17 +1,14 @@
-import { useMemo } from "react";
 import { HashRouter as Router, Route, Switch } from "react-router-dom";
 import { QueryParamProvider } from "use-query-params";
 import { ReactRouter5Adapter } from 'use-query-params/adapters/react-router-5';
-import { authService } from "../fbase";
-import { useAuthUser } from "../hooks/quries/useAuthUser";
-import Auth from "../routes/Auth";
-import Home from "../routes/Home";
-import Profile from "../routes/Profile";
+import useUser from "../hooks/queries/useUser";
+import Auth from "../pages/auth";
+import Home from "../pages/home";
+import Profile from "../pages/profile";
 import Navigation from "./Navigation";
 
 const AppRouter = () => {
-  const user = useAuthUser(['user'], authService);
-  const isLoggedIn = useMemo(() => user.data !== null, [user.data]);
+  const { isLoggedIn } = useUser()
   return (
     <Router>
       <QueryParamProvider adapter={ReactRouter5Adapter}>

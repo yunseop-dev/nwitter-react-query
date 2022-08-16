@@ -1,12 +1,14 @@
-import { authService } from "../fbase";
 import { useState } from "react";
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+import useSignUpMutation from "../hooks/mutations/useSignUpMutation";
+import useSignInWithEmailAndPasswordMutation from "../hooks/mutations/useSignInWithEmailAndPasswordMutation";
 
 const AuthForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [newAccount, setNewAccount] = useState(true);
   const [error, setError] = useState("");
+  const createUserWithEmailAndPassword = useSignUpMutation();
+  const signInWithEmailAndPassword = useSignInWithEmailAndPasswordMutation();
 
   const onChange = (event: any) => {
     const {
@@ -24,17 +26,15 @@ const AuthForm = () => {
     try {
       if (newAccount) {
         // create newAccount
-        await createUserWithEmailAndPassword(
-          authService,
+        await createUserWithEmailAndPassword.mutateAsync({
           email,
           password
-        );
+        });
       } else {
-        await signInWithEmailAndPassword(
-          authService,
+        await signInWithEmailAndPassword.mutateAsync({
           email,
           password
-        );
+        });
       }
     } catch (error: any) {
       setError(error.message);

@@ -1,62 +1,17 @@
 import { useState } from "react";
-import { authService, storageService } from "../fbase";
+import { storageService } from "../../../fbase";
 import { v4 as uuidv4 } from "uuid";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { getDownloadURL, ref, uploadString } from "firebase/storage";
-import { useAuthUser } from "../hooks/quries/useAuthUser";
-import { InfiniteData, useMutation, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
-import { INweet } from "../routes/Home";
-import { last } from "lodash";
-import produce from "immer";
-
-type INewNweet = Omit<INweet, 'id'>;
+import useAddNweetMutation, { INewNweet } from "../hooks/mutations/useAddNweetMutation";
+import useUser from "../../../hooks/queries/useUser";
 
 const NweetFactory = () => {
-  const queryClient = useQueryClient();
   const [nweet, setNweet] = useState("");
   const [attachment, setAttachment] = useState("");
-  const user = useAuthUser(['user'], authService, {
-    select: (data) => ({
-      uid: data?.uid ?? '',
-      displayName: data?.displayName ?? '',
-    })
-  });
-
-  const addDoc = useMutation(
-    (nweet: INewNweet) => axios.post<INweet>("https://firestore.googleapis.com/v1/projects/tablelab-d9e2e/databases/(default)/documents/nweets", {
-      fields: {
-        text: { stringValue: nweet.text },
-        createdAt: { integerValue: nweet.createdAt },
-        creatorId: { stringValue: nweet.creatorId },
-        attachmentUrl: { stringValue: nweet.attachmentUrl },
-      }
-    }).then(({ data }: any) => ({
-      id: last((data.name as string).split('/')),
-      text: data.fields.text.stringValue,
-      createdAt: Number(data.fields.createdAt.integerValue),
-      creatorId: data.fields.creatorId.stringValue,
-      attachmentUrl: data.fields.attachmentUrl.stringValue,
-    } as INweet)), {
-    async onSuccess(data) {
-      await queryClient.cancelQueries(['nweets'])
-      const previousNweets = queryClient.getQueryData<InfiniteData<{ list: INweet[]; nextPageToken: string; }>>(['nweets'])
-      queryClient.setQueryData<InfiniteData<{ list: INweet[]; nextPageToken: string; }>>(['nweets'], (oldData) => produce(oldData, draft => {
-        const pages = draft?.pages.map(item => ({
-          ...item,
-          list: [data, ...item.list]
-        }))
-        // @ts-ignore;
-        draft.pages = pages;
-      }))
-
-      return { previousNweets }
-    },
-    onError(error, variables, context: any) {
-      queryClient.setQueryData(['nweets'], context.previousNweets)
-    }
-  })
+  const user = useUser()
+  const addDoc = useAddNweetMutation()
 
   const onSubmit = async (event: any) => {
     event.preventDefault();
@@ -149,6 +104,7 @@ const NweetFactory = () => {
             style={{
               backgroundImage: attachment,
             }}
+            alt="attached"
           />
           <div className="factoryForm__clear" onClick={onClearAttachment}>
             <span>Remove</span>
