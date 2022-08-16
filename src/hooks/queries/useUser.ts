@@ -1,19 +1,19 @@
-import { User } from "firebase/auth";
 import { useMemo } from "react";
 import { authService } from "../../fbase";
 import { useAuthUser } from "../firebase/queries/useAuthUser";
+import useAccessTokenFromIndexedDb from "./useAccessTokenFromIndexedDb";
 
 export default function useUser() {
+    const idToken = useAccessTokenFromIndexedDb();
     const user = useAuthUser(['user'], authService, {
-        select: (data) => data ? ({
+        enabled: idToken.isSuccess,
+        select: (data = authService.currentUser) => ({
             uid: data?.uid ?? '',
             displayName: data?.displayName ?? '',
-        }) : null,
-        initialData: authService.currentUser as User
+        }),
     });
-
     return {
         ...user,
-        isLoggedIn: useMemo(() => user.data?.uid || user.data !== null, [user.data])
+        isLoggedIn: useMemo(() => !!idToken.data, [idToken.data])
     }
 }
