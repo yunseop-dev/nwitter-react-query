@@ -7,8 +7,13 @@ import {
 import AuthForm from "./components/AuthForm";
 import { GithubAuthProvider, GoogleAuthProvider } from "firebase/auth";
 import useSignInWithPopup from "./hooks/mutations/useSignInWithPopup";
+import useUser from "../../hooks/queries/useUser";
+import { useEffect } from "react";
+import useNweetHistory from "../../hooks/useNweetHistory";
 
 const Auth = () => {
+  const { isLoggedIn } = useUser();
+  const history = useNweetHistory();
   const signInWithPopup = useSignInWithPopup()
   const onSocialClick: React.MouseEventHandler<HTMLButtonElement> = async (event: any) => {
     const {
@@ -22,6 +27,11 @@ const Auth = () => {
       await signInWithPopup.mutateAsync({ provider });
     }
   };
+
+  useEffect(() => {
+    if (!isLoggedIn) return;
+    history.moveToHomePage();
+  }, [isLoggedIn, history])
 
   return (
     <div className="authContainer">

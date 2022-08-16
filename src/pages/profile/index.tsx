@@ -1,13 +1,13 @@
 import { authService } from "../../fbase";
 import { ChangeEventHandler, FormEventHandler, useEffect, useState } from "react";
-import { useHistory } from "react-router-dom";
 import { User } from "firebase/auth";
 import useUpdateProfileMutation from "./hooks/mutations/useUpdateProfileMutation";
 import useSignOutMutation from "./hooks/mutations/useSignOutMutation";
 import useUser from "../../hooks/queries/useUser";
+import useNweetHistory from "../../hooks/useNweetHistory";
 
 const Profile = () => {
-  const history = useHistory();
+  const history = useNweetHistory();
   const updateProfile = useUpdateProfileMutation();
   const signOut = useSignOutMutation();
   const user = useUser()
@@ -16,7 +16,7 @@ const Profile = () => {
 
   const onLogOutClick = async () => {
     await signOut.mutateAsync();
-    history.push("/");
+    history.moveToHomePage();
   };
 
   const onChange: ChangeEventHandler<HTMLInputElement> = (event) => {
@@ -40,28 +40,39 @@ const Profile = () => {
   }, [user.data?.displayName, user.isSuccess])
 
   return (
-    <div className="container">
-      <form onSubmit={onSubmit} className="profileForm">
-        <input
-          onChange={onChange}
-          type="text"
-          placeholder="Display name"
-          value={newDisplayName}
-          autoFocus
-          className="formInput"
-        />
-        <input
-          type="submit"
-          value="Update Profile"
-          className="formBtn"
-          style={{
-            marginTop: 10,
-          }}
-        />
-      </form>
-      <span className="formBtn cancelBtn logOut" onClick={onLogOutClick}>
-        Log Out
-      </span>
+    <div
+      style={{
+        maxWidth: 890,
+        width: "100%",
+        margin: "0 auto",
+        marginTop: 80,
+        display: "flex",
+        justifyContent: "center",
+      }}
+    >
+      <div className="container">
+        <form onSubmit={onSubmit} className="profileForm">
+          <input
+            onChange={onChange}
+            type="text"
+            placeholder="Display name"
+            value={newDisplayName}
+            autoFocus
+            className="formInput"
+          />
+          <input
+            type="submit"
+            value="Update Profile"
+            className="formBtn"
+            style={{
+              marginTop: 10,
+            }}
+          />
+        </form>
+        <span className="formBtn cancelBtn logOut" onClick={onLogOutClick}>
+          Log Out
+        </span>
+      </div>
     </div>
   );
 };
