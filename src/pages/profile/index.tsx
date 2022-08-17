@@ -57,7 +57,7 @@ const Profile = () => {
             className="cursor-pointer w-full px-5 py-2 text-center text-white rounded-2xl bg-twitter cursor-pointer mt-2.5"
           />
         </form>
-        <span className="cursor-pointer w-full px-5 py-2 text-center text-white rounded-2xl bg-rose-400 cursor-pointer mt-12" onClick={onLogOutClick}>
+        <span className="cursor-pointer w-full px-5 py-2 text-center text-white rounded-2xl bg-red-600 cursor-pointer mt-12" onClick={onLogOutClick}>
           Log Out
         </span>
       </div>

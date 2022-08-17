@@ -51,7 +51,7 @@ const Nweet = ({ nweetObj, isOwner }: any) => {
             />
             <input type="submit" value="Update Nweet" className="cursor-pointer mt-4 mb-1" />
           </form>
-          <button onClick={toggleEditing} className="cursor-pointer w-full px-5 py-2 text-center text-white rounded-2xl bg-rose-400">
+          <button type="button" onClick={toggleEditing} className="cursor-pointer w-full px-5 py-2 text-center text-white rounded-2xl bg-red-600">
             Cancel
           </button>
         </>
