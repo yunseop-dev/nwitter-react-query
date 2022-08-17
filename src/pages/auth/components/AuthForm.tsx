@@ -45,7 +45,7 @@ const AuthForm = () => {
 
   return (
     <>
-      <form onSubmit={onSubmit} className="container">
+      <form onSubmit={onSubmit} className="flex flex-col w-full max-w-xs">
         <input
           name="email"
           type="text"
@@ -53,7 +53,7 @@ const AuthForm = () => {
           required
           value={email}
           onChange={onChange}
-          className="authInput"
+          className="w-full max-w-xs p-2.5 rounded-3xl bg-white mb-2.5 text-xs text-black"
         />
         <input
           name="password"
@@ -62,16 +62,16 @@ const AuthForm = () => {
           required
           value={password}
           onChange={onChange}
-          className="authInput"
+          className="w-full max-w-xs p-2.5 rounded-3xl bg-white mb-2.5 text-xs text-black"
         />
         <input
           type="submit"
           value={newAccount ? "Create Account" : "Log In"}
-          className="authInput authSubmit"
+          className="w-full max-w-xs p-2.5 rounded-3xl bg-white mb-2.5 text-xs text-black text-center text-white mt-2.5 cursor-pointer bg-sky-400"
         />
-        {error && <span className="authError">{error}</span>}
+        {error && <span className="text-rose-600 text-center font-medium text-xs">{error}</span>}
       </form>
-      <span onClick={toggleAccount} className="authSwitch">
+      <span onClick={toggleAccount} className="text-sky-400 cursor-pointer mt-2.5 mb-12.5 block text-xs underline">
         {newAccount ? "Sign In" : "Create Account"}
       </span>
     </>
