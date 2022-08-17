@@ -1,9 +1,6 @@
 import { useState } from "react";
-import { storageService } from "../../../fbase";
-import { v4 as uuidv4 } from "uuid";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faTimes } from "@fortawesome/free-solid-svg-icons";
-import { getDownloadURL, ref, uploadString } from "firebase/storage";
 import useAddNweetMutation, { INewNweet } from "../hooks/mutations/useAddNweetMutation";
 import useUser from "../../../hooks/queries/useUser";
 
@@ -19,24 +16,11 @@ const NweetFactory = () => {
       return;
     }
 
-    let attachmentUrl = "";
-
-    if (attachment !== "") {
-      // const attachmentRef = storageService
-      //   .ref()
-      //   .child();
-
-      const attachmentRef = ref(storageService, `${user.data?.uid}/${uuidv4()}`)
-
-      await uploadString(attachmentRef, attachment, "data_url")
-      attachmentUrl = await getDownloadURL(attachmentRef);
-    }
-
     const nweetObj: INewNweet = {
       text: nweet,
       createdAt: Date.now(),
       creatorId: user.data?.uid ?? '',
-      attachmentUrl,
+      attachmentUrl: "",
     };
     await addDoc.mutateAsync(nweetObj)
 

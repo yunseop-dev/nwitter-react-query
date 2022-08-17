@@ -1,6 +1,4 @@
 import { Unsubscribe as AuthUnsubscribe } from "firebase/auth";
-import { Unsubscribe as FirestoreUnsubscribe } from "firebase/firestore";
-import { Unsubscribe as DatabaseUnsubscribe } from "firebase/database";
 import { useEffect } from "react";
 import {
     hashQueryKey,
@@ -12,7 +10,7 @@ import {
     UseQueryResult,
 } from "@tanstack/react-query";
 
-type Unsubscribe = AuthUnsubscribe | FirestoreUnsubscribe | DatabaseUnsubscribe;
+type Unsubscribe = AuthUnsubscribe;
 
 const unsubscribes: Record<string, any> = {};
 const observerCount: Record<string, number> = {};
