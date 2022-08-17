@@ -59,16 +59,18 @@ const NweetFactory = () => {
     <form onSubmit={onSubmit} className="flex flex-col items-center w-full">
       <div className="flex justify-between items-center flex-wrap relative mb-5 w-full">
         <input
-          className="grow-1 h-10 px-5 py-0 text-black border border-solid border-sky-400 rounded-2xl font-medium font-xs"
+          className="grow-1 h-10 px-5 py-0 text-black border border-solid border-twitter rounded-2xl font-medium font-xs"
           value={nweet}
           onChange={onChange}
           type="text"
           placeholder="What's on your mind?"
           maxLength={120}
         />
-        <input type="submit" value="&rarr;" className="absolute right-0 bg-sky-400 h-10 w-10 px-0 py-2.5 text-center rounded-3xl text-white" />
+        <button type="submit" className="absolute right-0 bg-twitter h-10 w-10 px-0 py-2.5 text-center rounded-3xl text-xs">
+          <span className="text-white">&rarr;</span>
+        </button>
       </div>
-      <label htmlFor="attach-file" className="text-sky-400 cursor-pointer">
+      <label htmlFor="attach-file" className="text-twitter cursor-pointer">
         <span className="mr-2.5 font-xs">Add photos</span>
         <FontAwesomeIcon icon={faPlus} />
       </label>
@@ -88,7 +90,7 @@ const NweetFactory = () => {
             }}
             alt="attached"
           />
-          <div className="text-sky-400 cursor-pointer text-center" onClick={onClearAttachment}>
+          <div className="text-twitter cursor-pointer text-center" onClick={onClearAttachment}>
             <span className="mr-2.5 text-xs">Remove</span>
             <FontAwesomeIcon icon={faTimes} />
           </div>

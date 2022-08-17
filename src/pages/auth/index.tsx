@@ -37,9 +37,8 @@ const Auth = () => {
   return (
     <div className="flex flex-col h-screen justify-center items-center">
       <FontAwesomeIcon
-        className="mb-7"
+        className="mb-7 text-twitter"
         icon={faTwitter}
-        color={"#04AAFF"}
         size="3x"
       />
       <AuthForm />

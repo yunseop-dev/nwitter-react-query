@@ -14,7 +14,7 @@ const Navigation = () => {
       <ul className="flex justify-center mt-12">
         <li>
           <Link to="/" className="mr-2.5">
-            <FontAwesomeIcon icon={faTwitter} color={"#04AAFF"} size="2x" />
+            <FontAwesomeIcon icon={faTwitter} className="text-twitter" size="2x" />
           </Link>
         </li>
         <li>
@@ -22,7 +22,7 @@ const Navigation = () => {
             to="/profile"
             className="flex flex-col items-center ml-2.5 text-xs"
           >
-            <FontAwesomeIcon icon={faUser} color={"#04AAFF"} size="2x" />
+            <FontAwesomeIcon icon={faUser} className="text-twitter" size="2x" />
             <span className="mt-2.5">
               {user.data?.displayName
                 ? `${user.data?.displayName}의 Profile`
