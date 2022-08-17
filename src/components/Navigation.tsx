@@ -4,7 +4,7 @@ import { faTwitter } from "@fortawesome/free-brands-svg-icons";
 import { faUser } from "@fortawesome/free-solid-svg-icons";
 import useUser from "../hooks/queries/useUser";
 
-const Navigation = ({ userObj }: any) => {
+const Navigation = () => {
   const user = useUser()
 
   if (!user.isLoggedIn) return <></>
