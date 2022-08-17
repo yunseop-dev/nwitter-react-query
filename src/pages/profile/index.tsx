@@ -40,36 +40,27 @@ const Profile = () => {
   }, [user.data?.displayName, user.isSuccess])
 
   return (
-    <div
-      style={{
-        maxWidth: 890,
-        width: "100%",
-        margin: "0 auto",
-        marginTop: 80,
-        display: "flex",
-        justifyContent: "center",
-      }}
-    >
-      <div className="container">
-        <form onSubmit={onSubmit} className="profileForm">
+    <div className="flex justify-center max-w-4xl w-full mx-auto mt-20 mb-0">
+      <div className="flex flex-col w-full max-w-xs">
+        <form onSubmit={onSubmit} className="flex flex-col border-b border-solid border-black/75 pb-7 w-full">
           <input
             onChange={onChange}
             type="text"
             placeholder="Display name"
             value={newDisplayName}
             autoFocus
-            className="formInput"
+            className="w-full px-5 py-2.5 rounded-2xl border border-solid border-black text-center bg-white text-black"
           />
           <input
             type="submit"
             value="Update Profile"
-            className="formBtn"
+            className="cursor-pointer w-full px-5 py-2 text-center text-white rounded-2xl bg-sky-400 cursor-pointer"
             style={{
               marginTop: 10,
             }}
           />
         </form>
-        <span className="formBtn cancelBtn logOut" onClick={onLogOutClick}>
+        <span className="cursor-pointer w-full px-5 py-2 text-center text-white rounded-2xl bg-rose-400 cursor-pointer mt-12" onClick={onLogOutClick}>
           Log Out
         </span>
       </div>

@@ -72,20 +72,20 @@ const NweetFactory = () => {
   const onClearAttachment = () => setAttachment("");
 
   return (
-    <form onSubmit={onSubmit} className="factoryForm">
-      <div className="factoryInput__container">
+    <form onSubmit={onSubmit} className="flex flex-col items-center w-full">
+      <div className="flex justify-between items-center flex-wrap relative mb-5 w-full">
         <input
-          className="factoryInput__input"
+          className="grow-1 h-10 px-5 py-0 text-white border border-solid border-sky-400 rounded-2xl font-medium font-xs"
           value={nweet}
           onChange={onChange}
           type="text"
           placeholder="What's on your mind?"
           maxLength={120}
         />
-        <input type="submit" value="&rarr;" className="factoryInput__arrow" />
+        <input type="submit" value="&rarr;" className="absolute right-0 bg-sky-400 h-10 w-10 px-0 py-2.5 text-center rounded-3xl text-white" />
       </div>
-      <label htmlFor="attach-file" className="factoryInput__label">
-        <span>Add photos</span>
+      <label htmlFor="attach-file" className="text-sky-400 cursor-pointer">
+        <span className="mr-2.5 font-xs">Add photos</span>
         <FontAwesomeIcon icon={faPlus} />
       </label>
       <input
@@ -98,7 +98,7 @@ const NweetFactory = () => {
         }}
       />
       {attachment && (
-        <div className="factoryForm__attachment">
+        <div className="flex flex-col justify-center">
           <img
             src={attachment}
             style={{
@@ -106,8 +106,8 @@ const NweetFactory = () => {
             }}
             alt="attached"
           />
-          <div className="factoryForm__clear" onClick={onClearAttachment}>
-            <span>Remove</span>
+          <div className="text-sky-400 cursor-pointer text-center" onClick={onClearAttachment}>
+            <span className="mr-2.5 text-xs">Remove</span>
             <FontAwesomeIcon icon={faTimes} />
           </div>
         </div>

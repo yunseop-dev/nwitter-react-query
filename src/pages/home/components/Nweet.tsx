@@ -37,21 +37,21 @@ const Nweet = ({ nweetObj, isOwner }: any) => {
   };
 
   return (
-    <div className="nweet">
+    <div className="flex flex-col text-black/75 relative rounded-xl p-5 max-w-xs w-full bg-white mb-5">
       {editing ? (
         <>
-          <form onSubmit={onSubmit} className="container nweetEdit">
+          <form onSubmit={onSubmit} className="flex flex-col w-full max-w-xs">
             <input
               onChange={onChange}
               value={newNweet}
               required
               placeholder="Edit your nweet"
               autoFocus
-              className="formInput"
+              className="w-full px-5 py-2.5 rounded-2xl border border-solid border-black text-center bg-white text-black"
             />
-            <input type="submit" value="Update Nweet" className="formBtn" />
+            <input type="submit" value="Update Nweet" className="cursor-pointer mt-4 mb-1" />
           </form>
-          <button onClick={toggleEditing} className="formBtn cancelBtn">
+          <button onClick={toggleEditing} className="cursor-pointer w-full px-5 py-2 text-center text-white rounded-2xl bg-rose-400">
             Cancel
           </button>
         </>
@@ -62,7 +62,7 @@ const Nweet = ({ nweetObj, isOwner }: any) => {
             <img src={nweetObj.attachmentUrl} width="50px" height="50px" alt="attached" />
           )}
           {isOwner && (
-            <div className="nweet__actions">
+            <div className="absolute right-2.5 top-2.5">
               <span onClick={onDeleteClick}>
                 <FontAwesomeIcon icon={faTrash} />
               </span>

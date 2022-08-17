@@ -8,19 +8,10 @@ const Home = () => {
   const nweets = useNweetsInfiniteQuery();
 
   return (
-    <div
-      style={{
-        maxWidth: 890,
-        width: "100%",
-        margin: "0 auto",
-        marginTop: 80,
-        display: "flex",
-        justifyContent: "center",
-      }}
-    >
-      <div className="container">
+    <div className="flex justify-center max-w-4xl w-full mx-auto mt-20 mb-0">
+      <div className="flex flex-col w-full max-w-xs">
         <NweetFactory />
-        <div style={{ marginTop: 30 }}>
+        <div className="mt-7">
           {nweets.list.map((nweet) => (
             <Nweet
               key={nweet.id}
