@@ -7,6 +7,8 @@ import useUser from "../hooks/queries/useUser";
 const Navigation = ({ userObj }: any) => {
   const user = useUser()
 
+  if (!user.isLoggedIn) return <></>
+
   return (
     <nav>
       <ul style={{ display: "flex", justifyContent: "center", marginTop: 50 }}>
