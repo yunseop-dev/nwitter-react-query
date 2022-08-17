@@ -13,7 +13,7 @@ const Navigation = () => {
     <nav>
       <ul className="flex justify-center mt-12">
         <li>
-          <Link to="/" className="mr-2.5">
+          <Link to="/" className="mr-2.5" aria-label="Twitter Logo">
             <FontAwesomeIcon icon={faTwitter} className="text-twitter" size="2x" />
           </Link>
         </li>
