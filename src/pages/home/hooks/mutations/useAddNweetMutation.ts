@@ -2,7 +2,7 @@ import { useQueryClient, useMutation, InfiniteData } from "@tanstack/react-query
 import axios from "axios";
 import produce from "immer";
 import last from "lodash/last";
-import { INweet } from "../queries/useNweetsInfiniteQuery";
+import { INweet } from "../queries/useNweetsQuery";
 
 export type INewNweet = Omit<INweet, 'id'>;
 
