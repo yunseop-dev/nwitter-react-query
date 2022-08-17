@@ -75,7 +75,7 @@ const NweetFactory = () => {
     <form onSubmit={onSubmit} className="flex flex-col items-center w-full">
       <div className="flex justify-between items-center flex-wrap relative mb-5 w-full">
         <input
-          className="grow-1 h-10 px-5 py-0 text-white border border-solid border-sky-400 rounded-2xl font-medium font-xs"
+          className="grow-1 h-10 px-5 py-0 text-black border border-solid border-sky-400 rounded-2xl font-medium font-xs"
           value={nweet}
           onChange={onChange}
           type="text"
@@ -93,9 +93,7 @@ const NweetFactory = () => {
         type="file"
         accept="image/*"
         onChange={onFileChange}
-        style={{
-          opacity: 0,
-        }}
+        className="opacity-0"
       />
       {attachment && (
         <div className="flex flex-col justify-center">

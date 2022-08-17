@@ -44,10 +44,10 @@ const Auth = () => {
       />
       <AuthForm />
       <div className="flex place-content-between w-full max-w-xs">
-        <button onClick={onSocialClick} name="google" className="cursor-pointer rounded-3xl border-none px-0 py-2.5 text-xs text-center w-36 bg-white">
+        <button onClick={onSocialClick} name="google" className="cursor-pointer rounded-3xl border-none px-0 py-2.5 text-xs text-center w-36 bg-white text-black">
           Continue with Google <FontAwesomeIcon icon={faGoogle} />
         </button>
-        <button onClick={onSocialClick} name="github" className="cursor-pointer rounded-3xl border-none px-0 py-2.5 text-xs text-center w-36 bg-white">
+        <button onClick={onSocialClick} name="github" className="cursor-pointer rounded-3xl border-none px-0 py-2.5 text-xs text-center w-36 bg-white text-black">
           Continue with Github <FontAwesomeIcon icon={faGithub} />
         </button>
       </div>
