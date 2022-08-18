@@ -3,19 +3,19 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash, faPencilAlt } from "@fortawesome/free-solid-svg-icons";
 import { Datum } from "../hooks/queries/useTodosQuery";
 // import useUpdateNweetMutation from "../hooks/mutations/useUpdateNweetMutation";
-// import useDeleteNweetMutation from "../hooks/mutations/useDeleteNweetMutation";
+import useDeleteNweetMutation from "../hooks/mutations/useDeleteNweetMutation";
 
 const Nweet = ({ nweetObj, isOwner }: { nweetObj: Datum; isOwner: boolean; }) => {
   const [editing, setEditing] = useState(false);
   const [newNweet, setNewNweet] = useState(nweetObj.attributes.text);
   // const updateDoc = useUpdateNweetMutation();
-  // const deleteDoc = useDeleteNweetMutation();
+  const deleteDoc = useDeleteNweetMutation();
 
   const onDeleteClick = async () => {
     const ok = window.confirm("삭제하시겠습니까?");
 
     if (ok) {
-      // await deleteDoc.mutateAsync(nweetObj.id);
+      await deleteDoc.mutateAsync(nweetObj.id);
     }
   };
 
