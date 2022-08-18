@@ -1,13 +1,11 @@
 import Nweet from "./components/Nweet";
 import NweetFactory from "./components/NweetFactory";
-import useNweetsQuery from "./hooks/queries/useNweetsQuery";
-import useUser from "../../hooks/queries/useUser";
+import useTodosQuery from "./hooks/queries/useTodosQuery";
 import { useMemo } from "react";
 import { useQueryParam, NumberParam } from "use-query-params";
 
 const Home = () => {
-  const user = useUser()
-  const nweets = useNweetsQuery();
+  const nweets = useTodosQuery();
   const [pageParam, setPageParam] = useQueryParam('page', NumberParam);
   const page = useMemo(() => pageParam ?? 1, [pageParam]);
 
@@ -16,11 +14,11 @@ const Home = () => {
       <div className="flex flex-col w-full max-w-xs">
         <NweetFactory />
         <div className="mt-7">
-          {nweets.data?.map((nweet) => (
+          {nweets.data?.data.map((nweet) => (
             <Nweet
               key={nweet.id}
               nweetObj={nweet}
-              isOwner={nweet.creatorId === user.data?.uid}
+              isOwner={true}
             />
           ))}
         </div>

@@ -1,44 +1,41 @@
-import { useQueryClient, useMutation, InfiniteData } from "@tanstack/react-query";
-import axios from "axios";
-import produce from "immer";
-import last from "lodash/last";
-import { INweet } from "../queries/useNweetsQuery";
+import { useQueryClient, useMutation } from "@tanstack/react-query";
+import axios, { AxiosResponse } from "axios";
+import { Attributes } from "../queries/useTodosQuery";
 
-export type INewNweet = Omit<INweet, 'id'>;
+export interface TodoInput {
+    data: TodoInputBody;
+}
+
+export interface TodoInputBody {
+    text: string;
+    done: boolean;
+}
+
+export interface TodoInputResponse {
+    data: Data;
+    meta: Meta;
+}
+
+export interface Data {
+    id: number;
+    attributes: Attributes;
+}
+
+export interface Meta {
+}
+
+
 
 export default function useAddNweetMutation() {
     const queryClient = useQueryClient();
-    return useMutation(
-        (nweet: INewNweet) => axios.post<INweet>("https://firestore.googleapis.com/v1/projects/tablelab-d9e2e/databases/(default)/documents/nweets", {
-            fields: {
-                text: { stringValue: nweet.text },
-                createdAt: { integerValue: nweet.createdAt },
-                creatorId: { stringValue: nweet.creatorId },
-                attachmentUrl: { stringValue: nweet.attachmentUrl },
-            }
-        }).then(({ data }: any) => ({
-            id: last((data.name as string).split('/')),
-            text: data.fields.text.stringValue,
-            createdAt: Number(data.fields.createdAt.integerValue),
-            creatorId: data.fields.creatorId.stringValue,
-            attachmentUrl: data.fields.attachmentUrl.stringValue,
-        } as INweet)), {
-        async onSuccess(data) {
-            await queryClient.cancelQueries(['nweets'])
-            const previousNweets = queryClient.getQueryData<InfiniteData<{ list: INweet[]; nextPageToken: string; }>>(['nweets'])
-            queryClient.setQueryData<InfiniteData<{ list: INweet[]; nextPageToken: string; }>>(['nweets'], (oldData) => produce(oldData, draft => {
-                const pages = draft?.pages.map(item => ({
-                    ...item,
-                    list: [data, ...item.list]
-                }))
-                // @ts-ignore;
-                draft.pages = pages;
-            }))
 
-            return { previousNweets }
+    return useMutation(
+        (nweet: TodoInputBody) => axios.post<TodoInputResponse, AxiosResponse<TodoInputResponse>, TodoInput>(
+            "http://localhost:1337/api/todos", {
+            data: nweet
+        }).then(({ data }) => data), {
+        onSettled: () => {
+            queryClient.invalidateQueries(['nweets'])
         },
-        onError(error, variables, context: any) {
-            queryClient.setQueryData(['nweets'], context.previousNweets)
-        }
     })
 }

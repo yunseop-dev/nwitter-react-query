@@ -1,20 +1,21 @@
 import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash, faPencilAlt } from "@fortawesome/free-solid-svg-icons";
-import useUpdateNweetMutation from "../hooks/mutations/useUpdateNweetMutation";
-import useDeleteNweetMutation from "../hooks/mutations/useDeleteNweetMutation";
+import { Datum } from "../hooks/queries/useTodosQuery";
+// import useUpdateNweetMutation from "../hooks/mutations/useUpdateNweetMutation";
+// import useDeleteNweetMutation from "../hooks/mutations/useDeleteNweetMutation";
 
-const Nweet = ({ nweetObj, isOwner }: any) => {
+const Nweet = ({ nweetObj, isOwner }: { nweetObj: Datum; isOwner: boolean; }) => {
   const [editing, setEditing] = useState(false);
-  const [newNweet, setNewNweet] = useState(nweetObj.text);
-  const updateDoc = useUpdateNweetMutation();
-  const deleteDoc = useDeleteNweetMutation();
+  const [newNweet, setNewNweet] = useState(nweetObj.attributes.text);
+  // const updateDoc = useUpdateNweetMutation();
+  // const deleteDoc = useDeleteNweetMutation();
 
   const onDeleteClick = async () => {
     const ok = window.confirm("삭제하시겠습니까?");
 
     if (ok) {
-      await deleteDoc.mutateAsync(nweetObj.id);
+      // await deleteDoc.mutateAsync(nweetObj.id);
     }
   };
 
@@ -29,10 +30,10 @@ const Nweet = ({ nweetObj, isOwner }: any) => {
 
   const onSubmit = async (event: any) => {
     event.preventDefault();
-    await updateDoc.mutateAsync({
-      id: nweetObj.id,
-      text: newNweet,
-    })
+    // await updateDoc.mutateAsync({
+    //   id: nweetObj.id,
+    //   text: newNweet,
+    // })
     setEditing(false);
   };
 
@@ -57,10 +58,7 @@ const Nweet = ({ nweetObj, isOwner }: any) => {
         </>
       ) : (
         <>
-          <h4>{nweetObj.id}/{nweetObj.text}</h4>
-          {nweetObj.attachmentUrl && (
-            <img src={nweetObj.attachmentUrl} width="50px" height="50px" alt="attached" />
-          )}
+          <h4>{nweetObj.id}/{nweetObj.attributes.text}</h4>
           {isOwner && (
             <div className="absolute right-2.5 top-2.5">
               <span onClick={onDeleteClick}>

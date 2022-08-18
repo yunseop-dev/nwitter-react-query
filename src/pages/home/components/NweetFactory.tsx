@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faTimes } from "@fortawesome/free-solid-svg-icons";
-import useAddNweetMutation, { INewNweet } from "../hooks/mutations/useAddNweetMutation";
 import useUser from "../../../hooks/queries/useUser";
+import useAddNweetMutation, { TodoInputBody } from "../hooks/mutations/useAddNweetMutation";
 
 const NweetFactory = () => {
   const [nweet, setNweet] = useState("");
@@ -16,11 +16,9 @@ const NweetFactory = () => {
       return;
     }
 
-    const nweetObj: INewNweet = {
+    const nweetObj: TodoInputBody = {
       text: nweet,
-      createdAt: Date.now(),
-      creatorId: user.data?.uid ?? '',
-      attachmentUrl: "",
+      done: false,
     };
     await addDoc.mutateAsync(nweetObj)
 
