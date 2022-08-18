@@ -2,13 +2,13 @@ import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash, faPencilAlt } from "@fortawesome/free-solid-svg-icons";
 import { Datum } from "../hooks/queries/useTodosQuery";
-// import useUpdateNweetMutation from "../hooks/mutations/useUpdateNweetMutation";
+import useUpdateNweetMutation from "../hooks/mutations/useUpdateNweetMutation";
 import useDeleteNweetMutation from "../hooks/mutations/useDeleteNweetMutation";
 
 const Nweet = ({ nweetObj, isOwner }: { nweetObj: Datum; isOwner: boolean; }) => {
   const [editing, setEditing] = useState(false);
   const [newNweet, setNewNweet] = useState(nweetObj.attributes.text);
-  // const updateDoc = useUpdateNweetMutation();
+  const updateDoc = useUpdateNweetMutation();
   const deleteDoc = useDeleteNweetMutation();
 
   const onDeleteClick = async () => {
@@ -30,10 +30,11 @@ const Nweet = ({ nweetObj, isOwner }: { nweetObj: Datum; isOwner: boolean; }) =>
 
   const onSubmit = async (event: any) => {
     event.preventDefault();
-    // await updateDoc.mutateAsync({
-    //   id: nweetObj.id,
-    //   text: newNweet,
-    // })
+    await updateDoc.mutateAsync({
+      id: nweetObj.id,
+      text: newNweet,
+      done: false
+    })
     setEditing(false);
   };
 
